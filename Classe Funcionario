@@ -1,0 +1,117 @@
+using MySql.Data.MySqlClient;
+using System;
+using System.Collections.Generic;
+
+namespace CadastroFuncionarios
+{
+    public class Funcionario
+    {
+        public int Id { get; set; }
+        public string Nome { get; set; }
+        public string Cpf { get; set; }
+        public DateTime DataNascimento { get; set; }
+        public string Cargo { get; set; }
+        public string Setor { get; set; }
+        public decimal Salario { get; set; }
+        public string Sexo { get; set; }
+
+        public void InserirFuncionario()
+        {
+            using (var conn = Conexao.ObterConexao())
+            {
+                conn.Open();
+                var cmd = new MySqlCommand("INSERT INTO funcionarios (nome, cpf, data_nascimento, cargo, setor, salario, sexo) VALUES (@nome, @cpf, @data, @cargo, @setor, @salario, @sexo)", conn);
+                cmd.Parameters.AddWithValue("@nome", Nome);
+                cmd.Parameters.AddWithValue("@cpf", Cpf);
+                cmd.Parameters.AddWithValue("@data", DataNascimento);
+                cmd.Parameters.AddWithValue("@cargo", Cargo);
+                cmd.Parameters.AddWithValue("@setor", Setor);
+                cmd.Parameters.AddWithValue("@salario", Salario);
+                cmd.Parameters.AddWithValue("@sexo", Sexo);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public void AtualizarFuncionario()
+        {
+            using (var conn = Conexao.ObterConexao())
+            {
+                conn.Open();
+                var cmd = new MySqlCommand("UPDATE funcionarios SET nome=@nome, cpf=@cpf, data_nascimento=@data, cargo=@cargo, setor=@setor, salario=@salario, sexo=@sexo WHERE id=@id", conn);
+                cmd.Parameters.AddWithValue("@id", Id);
+                cmd.Parameters.AddWithValue("@nome", Nome);
+                cmd.Parameters.AddWithValue("@cpf", Cpf);
+                cmd.Parameters.AddWithValue("@data", DataNascimento);
+                cmd.Parameters.AddWithValue("@cargo", Cargo);
+                cmd.Parameters.AddWithValue("@setor", Setor);
+                cmd.Parameters.AddWithValue("@salario", Salario);
+                cmd.Parameters.AddWithValue("@sexo", Sexo);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public void ExcluirFuncionario()
+        {
+            using (var conn = Conexao.ObterConexao())
+            {
+                conn.Open();
+                var cmd = new MySqlCommand("DELETE FROM funcionarios WHERE id=@id", conn);
+                cmd.Parameters.AddWithValue("@id", Id);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public static List<Funcionario> ListarTodosFuncionarios()
+        {
+            var lista = new List<Funcionario>();
+            using (var conn = Conexao.ObterConexao())
+            {
+                conn.Open();
+                var cmd = new MySqlCommand("SELECT * FROM funcionarios", conn);
+                var reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    lista.Add(new Funcionario
+                    {
+                        Id = Convert.ToInt32(reader["id"]),
+                        Nome = reader["nome"].ToString(),
+                        Cpf = reader["cpf"].ToString(),
+                        DataNascimento = Convert.ToDateTime(reader["data_nascimento"]),
+                        Cargo = reader["cargo"].ToString(),
+                        Setor = reader["setor"].ToString(),
+                        Salario = Convert.ToDecimal(reader["salario"]),
+                        Sexo = reader["sexo"].ToString()
+                    });
+                }
+            }
+            return lista;
+        }
+
+        public static List<Funcionario> ListarFuncionarioPorNome(string nome)
+        {
+            var lista = new List<Funcionario>();
+            using (var conn = Conexao.ObterConexao())
+            {
+                conn.Open();
+                var cmd = new MySqlCommand("SELECT * FROM funcionarios WHERE nome LIKE @nome", conn);
+                cmd.Parameters.AddWithValue("@nome", "%" + nome + "%");
+                var reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    lista.Add(new Funcionario
+                    {
+                        Id = Convert.ToInt32(reader["id"]),
+                        Nome = reader["nome"].ToString(),
+                        Cpf = reader["cpf"].ToString(),
+                        DataNascimento = Convert.ToDateTime(reader["data_nascimento"]),
+                        Cargo = reader["cargo"].ToString(),
+                        Setor = reader["setor"].ToString(),
+                        Salario = Convert.ToDecimal(reader["salario"]),
+                        Sexo = reader["sexo"].ToString()
+                    });
+                }
+            }
+            return lista;
+        }
+    }
+}
