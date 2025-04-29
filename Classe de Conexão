@@ -1,0 +1,14 @@
+using MySql.Data.MySqlClient;
+
+namespace CadastroFuncionarios
+{
+    public class Conexao
+    {
+        private static string connString = "server=localhost;database=empresa;uid=root;pwd=;";
+
+        public static MySqlConnection ObterConexao()
+        {
+            return new MySqlConnection(connString);
+        }
+    }
+}
